@@ -75,8 +75,13 @@ public class OrderService {
 		for (OrderEntity buyOrder : buyOrders) {
 			OrderEntity bestMatch = new OrderEntity();
 			if (sellOrders.size() > 1) {
-				bestMatch = sellOrders.stream().filter(so -> so.getOrderPrice() <= buyOrder.getOrderPrice())
+				if(sellOrders.stream().anyMatch(so -> so.getOrderPrice() <= buyOrder.getOrderPrice())) {
+					bestMatch = sellOrders.stream().filter(so -> so.getOrderPrice() <= buyOrder.getOrderPrice())
 						.reduce((first, second) -> second).get();
+				} else {
+					unmatchedOrders.add(buyOrder);
+					continue;
+				}
 			} else if (sellOrders.size() == 1) {
 				if (sellOrders.get(0).getOrderPrice() <= buyOrder.getOrderPrice()) {
 					bestMatch = sellOrders.get(0);
